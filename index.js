@@ -1,4 +1,3 @@
-
 const base = {
   from: "ubuntu:18.04", // TBD
   env: {
@@ -83,6 +82,7 @@ const options = {
 }
 
 function toDockerfile(config, choices) {
+  let dockerfile = []
   let allArgs = {
     ...config.args,
   }
@@ -90,37 +90,39 @@ function toDockerfile(config, choices) {
   let lines = []
   let envs = config.env
   for (const choice of choices) {
-    const x = options[choice]
-    allArgs = {...allArgs, ...x.args}
-    allAptPackages = [...allAptPackages, ...x.apt]
-    lines = lines.concat(x.lines || [])
-    envs = {...envs, ...x.env}
+    const pack = options[choice]
+    allArgs = {...allArgs, ...pack.args}
+    allAptPackages = [...allAptPackages, ...pack.apt]
+    lines = lines.concat(pack.lines || [])
+    envs = {...envs, ...pack.env}
   }
-  console.log(`FROM ${config.from}`)
+  dockerfile.push(`FROM ${config.from}`)
 
   for (const [k, v] of Object.entries(allArgs)) {
-    console.log(`ARG ${k}=${v}`)
+    dockerfile.push(`ARG ${k}=${v}`)
   }
   for (const [k, v] of Object.entries(envs)) {
-    console.log(`ENV ${k}=${v}`)
+    dockerfile.push(`ENV ${k}=${v}`)
   }
 
   if (allAptPackages.length) {
-    console.log(`RUN apt-get update && apt-get -y install \\\n\t${allAptPackages.join(` \\\n\t`)}`)
+    dockerfile.push(`RUN apt-get update && apt-get -y install \\\n\t${allAptPackages.join(` \\\n\t`)}`)
   }
 
   for (const line of lines) {
     if (line.add) {
-      console.log(`ADD ${line.add}`)
+      dockerfile.push(`ADD ${line.add}`)
     }
     if (line.run) {
       if (Array.isArray(line.run)) {
-        console.log(`RUN ${line.run.join(" && \\\n\t")}`)
+        dockerfile.push(`RUN ${line.run.join(" && \\\n\t")}`)
       } else {
-        console.log(`RUN ${line.run}`)
+        dockerfile.push(`RUN ${line.run}`)
       }
     }
   }
+
+  return dockerfile
 }
 
-toDockerfile(base, ["gradle", "jdk 11", "docker"])
+//toDockerfile(base, ["gradle", "jdk 11", "docker"])
