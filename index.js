@@ -125,4 +125,6 @@ function toDockerfile(config, choices) {
   return dockerfile
 }
 
-//toDockerfile(base, ["gradle", "jdk 11", "docker"])
+function allOptions() {
+  return options
+}

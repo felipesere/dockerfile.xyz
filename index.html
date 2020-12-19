@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Dockerfile</title>
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css">
+    <script src="index.js"></script>
+    <script>
+      function model() {
+        return {
+          selected: Object.keys(options).reduce((acc, val) => {
+            acc[val] = false
+            return acc
+          }, {}),
+          searchTerm: '',
+          visibleOptions() { return Object.keys(options).filter(v => v.includes(this.searchTerm)) },
+          dockerfile() {
+            let choices = []
+            for (const [k, v] of Object.entries(this.selected)) {
+              if (v) {
+                choices.push(k)
+              }
+            }
+
+            return toDockerfile(base, choices)
+          }
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Generate a quick Dockerfile</h1>
+
+    <div x-data="model()" x-init="$watch('selected', v => console.log(v))">
+      <input type="text" x-model="searchTerm" placeholder="Filter here...">
+      <ul>
+        <template x-for="[k, v] in Object.entries(selected)">
+          <div>
+            <input type="checkbox" x-bind:id="k" x-model="selected[k]"></input>
+            <label x-bind:for="k" x-text="k"></label>
+          </div>
+        </template>
+      </ul>
+
+      <button @click="console.log(JSON.stringify(selected))">Generate 🚀<button>
+
+      <code>
+        <template x-for="line in dockerfile()">
+          <div x-text="line"></div>
+        </template>
+      </code>
+    </div>
+  </body>
+</html>
