@@ -34,24 +34,28 @@
   <body>
     <h1>Generate a quick Dockerfile</h1>
 
-    <div x-data="model()" x-init="$watch('selected', v => console.log(v))">
-      <input type="text" x-model="searchTerm" placeholder="Filter here...">
-      <ul>
-        <template x-for="k in Object.keys(visibleOptions())">
-          <div>
-            <input type="checkbox" x-bind:id="k" x-model="selected[k]"></input>
-            <label x-bind:for="k" x-text="k"></label>
-          </div>
-        </template>
-      </ul>
+    <div class="side-by-side" x-data="model()" x-init="$watch('selected', v => console.log(v))">
+      <div>
+        <input type="text" x-model="searchTerm" placeholder="Filter here...">
+        <ul>
+          <template x-for="k in Object.keys(visibleOptions())">
+            <div>
+              <input type="checkbox" x-bind:id="k" x-model="selected[k]"></input>
+              <label x-bind:for="k" x-text="k"></label>
+            </div>
+          </template>
+        </ul>
+      </div>
 
-      <code>
-        <template x-for="line in dockerfile()">
-          <span x-text="line"></span>
-        </template>
-      </code>
+      <div>
+        <code>
+          <template x-for="line in dockerfile()">
+            <span x-text="line"></span>
+          </template>
+        </code>
 
-      <button @click="$clipboard(dockerfile().join('\n'))">Copy</button>
+        <button @click="$clipboard(dockerfile().join('\n'))">Copy</button>
+      </div>
     </div>
   </body>
 </html>

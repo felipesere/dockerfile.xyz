@@ -1,8 +1,19 @@
 code {
   display: flex;
-  flex-direction:column
+  flex-direction: column;
+
+  min-width: 800px;
 }
 
 button {
   margin-top: 2rem;
+}
+
+.side-by-side {
+  display: flex;
+  flex-direction: row;
+}
+
+ul {
+  padding-inline-start: 0;
 }
