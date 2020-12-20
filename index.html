@@ -9,12 +9,19 @@
     <link rel="stylesheet" href="/app.css">
     <script src="index.js"></script>
     <script>
+      function fromUrl() {
+        let params = new URLSearchParams(location.search)
+        let parts = (params.get('selected') || "").split(",")
+        let selection = Object.keys(options).reduce((acc, val) => {
+          acc[val] = parts.includes(val)
+          return acc
+        }, {})
+        return selection
+      }
+
       function model() {
         return {
-          selected: Object.keys(options).reduce((acc, val) => {
-            acc[val] = false
-            return acc
-          }, {}),
+          selected: fromUrl(),
           searchTerm: '',
           visibleOptions() {
             let visible = Object.entries(options).filter(([name, f]) => name.includes(this.searchTerm))
@@ -26,6 +33,17 @@
               .map(([name, checked]) => name)
 
             return toDockerfile(base, choices)
+          },
+          updateUrl() {
+            const picked = Object.entries(this.selected).filter(([k, checked]) => checked).map(([k, f]) => k)
+
+            const url = new URL(window.location.href);
+            if (picked.length) {
+              url.searchParams.set('selected', picked.join(','));
+            } else {
+              url.searchParams.delete('selected');
+            }
+            history.pushState(null, document.title, url.toString());
           }
         }
       }
@@ -33,15 +51,15 @@
   </head>
   <body>
     <h1>Generate a quick Dockerfile</h1>
+    <div class="side-by-side" x-data="model()" >
 
-    <div class="side-by-side" x-data="model()" x-init="$watch('selected', v => console.log(v))">
-      <div>
+      <div >
         <input type="text" x-model="searchTerm" placeholder="Filter here...">
         <ul>
-          <template x-for="k in Object.keys(visibleOptions())">
+          <template x-for="choice in Object.keys(visibleOptions())">
             <div>
-              <input type="checkbox" x-bind:id="k" x-model="selected[k]"></input>
-              <label x-bind:for="k" x-text="k"></label>
+              <input type="checkbox" :id="choice" x-model="selected[choice]" @change="updateUrl()"></input>
+              <label :for="choice" x-text="choice"></label>
             </div>
           </template>
         </ul>
