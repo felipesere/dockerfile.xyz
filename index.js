@@ -124,3 +124,8 @@ function toDockerfile(config, choices) {
 
   return dockerfile
 }
+
+module.exports = {
+  toDockerfile,
+  ubuntu1804,
+}

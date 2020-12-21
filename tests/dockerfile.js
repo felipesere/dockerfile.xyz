@@ -1,6 +1,5 @@
-import { test } from 'uvu';
-import * as assert from 'uvu/assert';
-
+const test = require('uvu').test;
+const assert = require('uvu/assert');
 
 const { ubuntu1804, toDockerfile } = require('../index.js');
 
