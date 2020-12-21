@@ -2,11 +2,3 @@ code {
   display: flex;
   flex-direction: column;
 }
-
-button {
-  margin-top: 2rem;
-}
-
-ul {
-  padding-inline-start: 0;
-}
