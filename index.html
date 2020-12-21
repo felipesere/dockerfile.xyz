@@ -7,7 +7,9 @@
     <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css">
     <link rel="stylesheet" href="/app.css">
+
     <script src="index.js"></script>
+
     <script>
       function onlySelected(opts) {
         return Object.entries(opts).filter(([k, checked]) => checked).map(([k, f]) => k)
@@ -51,29 +53,23 @@
   </head>
   <body>
     <h1>Generate a quick Dockerfile</h1>
-    <div class="side-by-side" x-data="model()" >
+    <div x-data="model()" >
+      <input type="text" x-model="searchTerm" placeholder="Filter here...">
+      <ul>
+        <template x-for="(choice, index) in Object.keys(visibleOptions())" :key="index">
+          <div>
+            <input type="checkbox" :id="choice" x-model="selected[choice]" @change="updateUrl()"></input>
+            <label :for="choice" x-text="choice"></label>
+          </div>
+        </template>
+      </ul>
+      <code>
+        <template x-for="line in dockerfile()">
+          <span style="white-space: pre;" x-text="line"></span>
+        </template>
+      </code>
 
-      <div >
-        <input type="text" x-model="searchTerm" placeholder="Filter here...">
-        <ul>
-          <template x-for="choice in Object.keys(visibleOptions())">
-            <div>
-              <input type="checkbox" :id="choice" x-model="selected[choice]" @change="updateUrl()"></input>
-              <label :for="choice" x-text="choice"></label>
-            </div>
-          </template>
-        </ul>
-      </div>
-
-      <div>
-        <code>
-          <template x-for="line in dockerfile()">
-            <span x-text="line"></span>
-          </template>
-        </code>
-
-        <button @click="$clipboard(dockerfile().join('\n'))">Copy</button>
-      </div>
+      <button @click="$clipboard(dockerfile().join('\n'))">Copy</button>
     </div>
   </body>
 </html>
