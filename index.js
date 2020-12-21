@@ -1,4 +1,4 @@
-const base = {
+const ubuntu1804 = {
   from: "ubuntu:18.04", // TBD
   env: {
     DEBIAN_FRONTEND: "noninteractive",
@@ -8,7 +8,7 @@ const base = {
   layers: [],
 }
 
-const options = {
+const builtinOptions = {
   "jq": {
     apt: ["jq"],
   },
@@ -90,7 +90,7 @@ function toDockerfile(config, choices) {
   let lines = []
   let envs = config.env
   for (const choice of choices) {
-    const pack = options[choice]
+    const pack = builtinOptions[choice]
     allArgs = {...allArgs, ...pack.args}
     allAptPackages = [...allAptPackages, ...pack.apt]
     lines = lines.concat(pack.lines || [])
@@ -123,8 +123,4 @@ function toDockerfile(config, choices) {
   }
 
   return dockerfile
-}
-
-function allOptions() {
-  return options
 }

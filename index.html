@@ -9,10 +9,14 @@
     <link rel="stylesheet" href="/app.css">
     <script src="index.js"></script>
     <script>
+      function onlySelected(opts) {
+        return Object.entries(opts).filter(([k, checked]) => checked).map(([k, f]) => k)
+      }
+
       function fromUrl() {
         let params = new URLSearchParams(location.search)
         let parts = (params.get('selected') || "").split(",")
-        let selection = Object.keys(options).reduce((acc, val) => {
+        let selection = Object.keys(builtinOptions).reduce((acc, val) => {
           acc[val] = parts.includes(val)
           return acc
         }, {})
@@ -24,18 +28,14 @@
           selected: fromUrl(),
           searchTerm: '',
           visibleOptions() {
-            let visible = Object.entries(options).filter(([name, f]) => name.includes(this.searchTerm))
+            let visible = Object.entries(builtinOptions).filter(([name, f]) => name.includes(this.searchTerm))
             return Object.fromEntries(visible)
           },
           dockerfile() {
-            let choices = Object.entries(this.selected)
-              .filter(([name, checked]) => checked)
-              .map(([name, checked]) => name)
-
-            return toDockerfile(base, choices)
+            return toDockerfile(ubuntu1804, onlySelected(this.selected))
           },
           updateUrl() {
-            const picked = Object.entries(this.selected).filter(([k, checked]) => checked).map(([k, f]) => k)
+            const picked = onlySelected(this.selected)
 
             const url = new URL(window.location.href);
             if (picked.length) {
