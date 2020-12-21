@@ -51,8 +51,8 @@
     </script>
   </head>
 
-  <body class="bg-grey-light leading-normal tracking-normal">
-    <main  class="max-w-prose mx-auto">
+  <body class="max-w-prose mx-auto bg-grey-light leading-normal tracking-normal flex flex-col h-screen justify-between">
+    <main  class="mb-auto">
       <h1 class="text-4xl font-normal tracking-wide my-12">Generate a quick Dockerfile</h1>
 
       <div x-data="model()" >
@@ -75,5 +75,13 @@
         <button @click="$clipboard(dockerfile().join('\n'))" class="my-4 uppercase px-8 py-2 rounded border border-blue-600 text-blue-600 max-w-max shadow-sm hover:shadow-md">Copy 📋</button>
       </div>
     </main>
+    <footer class="mb-5">
+      <p class="font-bold text-gray-700 uppercase underline mt-4 mb-2 mx-auto">Links:</p>
+      <div class="flex flex-row justify-between">
+        <a href="https://felipesere.com" class="text-blue-700 text-md hover:text-blue-500">Blog</a>
+        <a href="https://twitter.com/felipesere" class="text-blue-700  text-md hover:text-blue-500">Twitter</a>
+        <a href="https://github.com/felipesere/dockerfile.dev" class="text-blue-700 text-md hover:text-blue-500">GitHub</a>
+      </div>
+    </footer>
   </body>
 </html>
