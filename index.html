@@ -5,7 +5,8 @@
     <title>Dockerfile</title>
     <script src="https://cdn.jsdelivr.net/npm/@ryangjchandler/alpine-clipboard@0.1.x/dist/alpine-clipboard.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css">
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css"> -->
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/app.css">
 
     <script src="index.js"></script>
@@ -51,25 +52,30 @@
       }
     </script>
   </head>
-  <body>
-    <h1>Generate a quick Dockerfile</h1>
-    <div x-data="model()" >
-      <input type="text" x-model="searchTerm" placeholder="Filter here...">
-      <ul>
-        <template x-for="(choice, index) in Object.keys(visibleOptions())" :key="index">
-          <div>
-            <input type="checkbox" :id="choice" x-model="selected[choice]" @change="updateUrl()"></input>
-            <label :for="choice" x-text="choice"></label>
-          </div>
-        </template>
-      </ul>
-      <code>
-        <template x-for="line in dockerfile()">
-          <span style="white-space: pre;" x-text="line"></span>
-        </template>
-      </code>
 
-      <button @click="$clipboard(dockerfile().join('\n'))">Copy</button>
-    </div>
+  <body class="bg-grey-light font-sans leading-normal tracking-normal">
+    <main  class="max-w-prose mx-auto">
+      <h1 class="text-xl my-12">Generate a quick Dockerfile</h1>
+
+      <div x-data="model()" >
+        <input type="text" x-model="searchTerm" placeholder="Filter here..." class="my-4 input border border-gray-400 appearance-none rounded w-full px-3 py-3 pt-2 pb-2 focus focus:border-blue-600 focus:outline-none active:outline-none active:border-blue-600" >
+        <ul class="my-4 ">
+          <template x-for="(choice, index) in Object.keys(visibleOptions())" :key="index">
+            <div class="my-2">
+              <input type="checkbox" :id="choice" x-model="selected[choice]" @change="updateUrl()"></input>
+              <label :for="choice" x-text="choice"></label>
+            </div>
+          </template>
+        </ul>
+
+        <code class="bg-gray-200 p-4 rounded border border-gray-400 overflow-x-auto text-xs">
+          <template x-for="line in dockerfile()">
+            <span class="whitespace-pre" x-text="line"></span>
+          </template>
+        </code>
+
+        <button @click="$clipboard(dockerfile().join('\n'))" class="uppercase px-8 py-2 rounded border border-blue-600 text-blue-600 max-w-max shadow-sm hover:shadow-md">Copy</button>
+      </div>
+    </main>
   </body>
 </html>
