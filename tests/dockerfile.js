@@ -13,23 +13,25 @@ test('minimal toDockerfile', () => {
 
 test('just adding a package to install', () => {
   assert.equal(toDockerfile(ubuntu1804, [
-    {apt: ['jq']}
+    {apt: ['jq'], name: "jq"},
   ]), [
     'FROM ubuntu:18.04',
     'ENV DEBIAN_FRONTEND=noninteractive',
     'ENV TZ=Europe/London',
+    '// for jq',
     'RUN apt-get update && apt-get -y install \\\n\tjq'
   ])
 });
 
 test('adding multiple packages', () => {
   assert.equal(toDockerfile(ubuntu1804, [
-    {apt: ['jq']},
-    {apt: ['awscli']}
+    {apt: ['jq'], name: "jq"},
+    {apt: ['awscli'], name: "AWS/Cli v1"}
   ]), [
     'FROM ubuntu:18.04',
     'ENV DEBIAN_FRONTEND=noninteractive',
     'ENV TZ=Europe/London',
+    '// for jq, AWS/Cli v1',
     'RUN apt-get update && apt-get -y install \\\n\tjq \\\n\tawscli'
   ])
 });

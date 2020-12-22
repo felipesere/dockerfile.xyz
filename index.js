@@ -103,7 +103,9 @@ function toDockerfile(config, choices) {
   let envs = config.env
   for (const pack of choices) {
     allArgs = {...allArgs, ...pack.args}
-    allAptPackages = [...allAptPackages, ...pack.apt]
+    if (pack.apt.length) { // track packs thats need 'apt' packages installed
+      allAptPackages = allAptPackages.concat([pack])
+    }
     lines = lines.concat(pack.lines || [])
     envs = {...envs, ...pack.env}
   }
@@ -117,7 +119,9 @@ function toDockerfile(config, choices) {
   }
 
   if (allAptPackages.length) {
-    dockerfile.push(`RUN apt-get update && apt-get -y install \\\n\t${allAptPackages.join(` \\\n\t`)}`)
+    // write a nice comment:
+    dockerfile.push(`// for ${allAptPackages.map(pack => pack.name).join(", ")}`)
+    dockerfile.push(`RUN apt-get update && apt-get -y install \\\n\t${allAptPackages.flatMap(pack => pack.apt).join(` \\\n\t`)}`)
   }
 
   for (const line of lines) {
