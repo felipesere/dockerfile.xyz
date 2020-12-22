@@ -29,7 +29,7 @@
           selected: fromUrl(),
           searchTerm: '',
           visibleOptions() {
-            let visible = Object.entries(builtinOptions).filter(([name, f]) => name.includes(this.searchTerm))
+            let visible = Object.entries(builtinOptions).filter(([name, f]) => name.includes(this.searchTerm) || f.name.includes(this.searchTerm))
             return Object.fromEntries(visible)
           },
           dockerfile() {
