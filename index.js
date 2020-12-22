@@ -118,8 +118,9 @@ function toDockerfile(config, packs) {
 
   if (allAptPackages.length) {
     // write a nice comment:
+    let uniqueAptPackages = [...new Set(allAptPackages.flatMap(pack => pack.apt))];
     dockerfile.push(`// for ${allAptPackages.map(pack => pack.name).join(", ")}`)
-    dockerfile.push(`RUN apt-get update && apt-get -y install \\\n\t${allAptPackages.flatMap(pack => pack.apt).join(` \\\n\t`)}`)
+    dockerfile.push(`RUN apt-get update && apt-get -y install \\\n\t${uniqueAptPackages.join(` \\\n\t`)}`)
   }
 
   for (const pack of packs) {
