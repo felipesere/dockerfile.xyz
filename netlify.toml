@@ -1,0 +1,2 @@
+[build]
+  command = "postcss app.css -o compiled.css"
