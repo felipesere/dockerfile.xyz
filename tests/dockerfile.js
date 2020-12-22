@@ -3,7 +3,7 @@ const assert = require('uvu/assert');
 
 const { ubuntu1804, toDockerfile } = require('../index.js');
 
-test('minimal dockerfile', () => {
+test('minimal toDockerfile', () => {
   assert.equal(toDockerfile(ubuntu1804, []), [
     'FROM ubuntu:18.04',
     'ENV DEBIAN_FRONTEND=noninteractive',
@@ -12,7 +12,9 @@ test('minimal dockerfile', () => {
 });
 
 test('just adding a package to install', () => {
-  assert.equal(toDockerfile(ubuntu1804, ['jq']), [
+  assert.equal(toDockerfile(ubuntu1804, [
+    {apt: ['jq']}
+  ]), [
     'FROM ubuntu:18.04',
     'ENV DEBIAN_FRONTEND=noninteractive',
     'ENV TZ=Europe/London',
@@ -21,7 +23,10 @@ test('just adding a package to install', () => {
 });
 
 test('adding multiple packages', () => {
-  assert.equal(toDockerfile(ubuntu1804, ['jq', 'aws/cli v1']), [
+  assert.equal(toDockerfile(ubuntu1804, [
+    {apt: ['jq']},
+    {apt: ['awscli']}
+  ]), [
     'FROM ubuntu:18.04',
     'ENV DEBIAN_FRONTEND=noninteractive',
     'ENV TZ=Europe/London',

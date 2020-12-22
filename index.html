@@ -33,7 +33,7 @@
             return Object.fromEntries(visible)
           },
           dockerfile() {
-            return toDockerfile(ubuntu1804, onlySelected(this.selected))
+            return dockerfile(onlySelected(this.selected))
           },
           updateUrl() {
             const picked = onlySelected(this.selected)
@@ -58,10 +58,10 @@
       <div x-data="model()" >
         <input type="text" x-model="searchTerm" placeholder="Filter here..." class="input border border-gray-400 appearance-none rounded w-full px-3 py-3 pt-2 pb-2 focus focus:border-blue-600 focus:outline-none active:outline-none active:border-blue-600" >
         <ul class="my-4 grid grid-cols-3 gap-4">
-          <template x-for="(choice, index) in Object.keys(visibleOptions())" :key="index">
+          <template x-for="[choice, pack] in Object.entries(visibleOptions())" :key="choice">
             <div class="flex flex-row">
               <input class="self-center" type="checkbox" :id="choice" x-model="selected[choice]" @change="updateUrl()"></input>
-              <label class="self-center ml-2" :for="choice" x-text="choice"></label>
+              <label class="self-center ml-2" :for="choice" x-text="pack.name"></label>
             </div>
           </template>
         </ul>

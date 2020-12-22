@@ -10,20 +10,22 @@ const ubuntu1804 = {
 
 const builtinOptions = {
   "jq": {
+    name: "jq",
     apt: ["jq"],
   },
 
   "aws/cli v1": {
+    name: "AWS/Cli v1",
     apt: [
       "awscli",
     ],
   },
   "aws/cli v2": {
+    name: "AWS/Cli v2",
     apt: [
       "curl",
       "unzip",
     ],
-    args: {},
     lines: [
       {
         run: [
@@ -35,6 +37,7 @@ const builtinOptions = {
     ]
   },
   "terraform 13": {
+    name: "Terraform 13",
     args: {
       TERRAFORM_VERSION: "0.13.3",
     },
@@ -45,6 +48,7 @@ const builtinOptions = {
     ]
   },
   "docker": {
+    name: "Docker",
     apt: [
       "apt-transport-https",
       "ca-certificates",
@@ -59,9 +63,11 @@ const builtinOptions = {
     ]
   },
   "jdk 11": {
+    name: "JDK 11",
     apt: ["openjdk-11-jdk"],
   },
   "gradle": {
+    name: "Gradle",
     env: {
       GRADLE_HOME: "/gradle-$GRADLE_VERSION",
       PATH: "$GRADLE_HOME/bin:$PATH"
@@ -81,6 +87,12 @@ const builtinOptions = {
   }
 }
 
+function dockerfile(choices) {
+  let extras = choices.map((c) => builtinOptions[c])
+
+  return toDockerfile(ubuntu1804, extras)
+}
+
 function toDockerfile(config, choices) {
   let dockerfile = []
   let allArgs = {
@@ -89,8 +101,7 @@ function toDockerfile(config, choices) {
   let allAptPackages = []
   let lines = []
   let envs = config.env
-  for (const choice of choices) {
-    const pack = builtinOptions[choice]
+  for (const pack of choices) {
     allArgs = {...allArgs, ...pack.args}
     allAptPackages = [...allAptPackages, ...pack.apt]
     lines = lines.concat(pack.lines || [])
@@ -125,7 +136,12 @@ function toDockerfile(config, choices) {
   return dockerfile
 }
 
-module.exports = {
-  toDockerfile,
-  ubuntu1804,
+// If we are running in the browser, there is no need to go through a module
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    dockerfile,
+    toDockerfile,
+    ubuntu1804,
+  };
 }
+
