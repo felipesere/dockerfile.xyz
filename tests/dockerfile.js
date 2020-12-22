@@ -36,4 +36,22 @@ test('adding multiple packages', () => {
   ])
 });
 
+test('"run" lines also get a comment as to why they are added', () => {
+  assert.equal(toDockerfile(ubuntu1804, [
+    {name: "Single Line", lines: [ {run: "just one line"} ], apt: [],  },
+    {name: "Multipels Lines", lines: [ {run: ["one line", "and another"]} ], apt: [],  }
+  ]),
+    [
+      'FROM ubuntu:18.04',
+      'ENV DEBIAN_FRONTEND=noninteractive',
+      'ENV TZ=Europe/London',
+      '\n',
+      '// for Single Line:',
+      'RUN just one line',
+      '\n',
+      '// for Multipels Lines:',
+      'RUN one line && \\\n\tand another'
+    ])
+});
+
 test.run();

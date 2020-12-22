@@ -93,20 +93,18 @@ function dockerfile(choices) {
   return toDockerfile(ubuntu1804, extras)
 }
 
-function toDockerfile(config, choices) {
+function toDockerfile(config, packs) {
   let dockerfile = []
   let allArgs = {
     ...config.args,
   }
   let allAptPackages = []
-  let lines = []
   let envs = config.env
-  for (const pack of choices) {
+  for (const pack of packs) {
     allArgs = {...allArgs, ...pack.args}
     if (pack.apt.length) { // track packs thats need 'apt' packages installed
       allAptPackages = allAptPackages.concat([pack])
     }
-    lines = lines.concat(pack.lines || [])
     envs = {...envs, ...pack.env}
   }
   dockerfile.push(`FROM ${config.from}`)
@@ -124,15 +122,21 @@ function toDockerfile(config, choices) {
     dockerfile.push(`RUN apt-get update && apt-get -y install \\\n\t${allAptPackages.flatMap(pack => pack.apt).join(` \\\n\t`)}`)
   }
 
-  for (const line of lines) {
-    if (line.add) {
-      dockerfile.push(`ADD ${line.add}`)
-    }
-    if (line.run) {
-      if (Array.isArray(line.run)) {
-        dockerfile.push(`RUN ${line.run.join(" && \\\n\t")}`)
-      } else {
-        dockerfile.push(`RUN ${line.run}`)
+  for (const pack of packs) {
+    if (pack.lines && pack.lines.length) {
+      dockerfile.push(`\n`)
+      dockerfile.push(`// for ${pack.name}:`)
+      for (const line of (pack.lines || [])) {
+        if (line.add) {
+          dockerfile.push(`ADD ${line.add}`)
+        }
+        if (line.run) {
+          if (Array.isArray(line.run)) {
+            dockerfile.push(`RUN ${line.run.join(" && \\\n\t")}`)
+          } else {
+            dockerfile.push(`RUN ${line.run}`)
+          }
+        }
       }
     }
   }
