@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "uvu tests"
+    "test": "uvu tests",
+    "fmt": "prettier --write ."
   },
   "keywords": [],
   "author": "",
@@ -12,6 +13,7 @@
   "devDependencies": {
     "cssnano": "^4.1.10",
     "postcss-cli": "^8.3.1",
+    "prettier": "2.2.1",
     "uvu": "^0.5.1"
   },
   "dependencies": {

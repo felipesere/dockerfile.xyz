@@ -1,88 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>Dockerfile</title>
     <link rel="shortcut icon" href="/docker.ico" />
 
-    <script async defer data-domain="dockerfile.xyz" src="https://plausible.io/js/plausible.js"></script>
-    <link href="/compiled.css" rel="stylesheet">
+    <script
+      async
+      defer
+      data-domain="dockerfile.xyz"
+      src="https://plausible.io/js/plausible.js"
+    ></script>
+    <link href="/compiled.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/@ryangjchandler/alpine-clipboard@0.1.x/dist/alpine-clipboard.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+    <script
+      src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js"
+      defer
+    ></script>
     <script src="index.js"></script>
 
     <script>
       function onlySelected(opts) {
-        return Object.entries(opts).filter(([k, checked]) => checked).map(([k, f]) => k)
+        return Object.entries(opts)
+          .filter(([k, checked]) => checked)
+          .map(([k, f]) => k);
       }
 
       function fromUrl() {
-        let params = new URLSearchParams(location.search)
-        let parts = (params.get('selected') || "").split(",")
+        let params = new URLSearchParams(location.search);
+        let parts = (params.get("selected") || "").split(",");
         let selection = Object.keys(builtinOptions).reduce((acc, val) => {
-          acc[val] = parts.includes(val)
-          return acc
-        }, {})
-        return selection
+          acc[val] = parts.includes(val);
+          return acc;
+        }, {});
+        return selection;
       }
 
       function model() {
         return {
           selected: fromUrl(),
-          searchTerm: '',
+          searchTerm: "",
           visibleOptions() {
-            let visible = Object.entries(builtinOptions).filter(([name, f]) => name.includes(this.searchTerm) || f.name.includes(this.searchTerm))
-            return Object.fromEntries(visible)
+            let visible = Object.entries(builtinOptions).filter(
+              ([name, f]) =>
+                name.includes(this.searchTerm) ||
+                f.name.includes(this.searchTerm)
+            );
+            return Object.fromEntries(visible);
           },
           dockerfile() {
-            return dockerfile(onlySelected(this.selected))
+            return dockerfile(onlySelected(this.selected));
           },
           updateUrl() {
-            const picked = onlySelected(this.selected)
+            const picked = onlySelected(this.selected);
 
             const url = new URL(window.location.href);
             if (picked.length) {
-              url.searchParams.set('selected', picked.join(','));
+              url.searchParams.set("selected", picked.join(","));
             } else {
-              url.searchParams.delete('selected');
+              url.searchParams.delete("selected");
             }
             history.pushState(null, document.title, url.toString());
-          }
-        }
+          },
+        };
       }
     </script>
   </head>
 
-  <body class="max-w-prose mx-auto bg-grey-light leading-normal tracking-normal flex flex-col h-screen justify-between">
-    <main  class="mb-auto">
-      <h1 class="text-4xl font-normal tracking-wide my-12">Generate a quick Dockerfile</h1>
+  <body
+    class="max-w-prose mx-auto bg-grey-light leading-normal tracking-normal flex flex-col h-screen justify-between"
+  >
+    <main class="mb-auto">
+      <h1 class="text-4xl font-normal tracking-wide my-12">
+        Generate a quick Dockerfile
+      </h1>
 
-      <div x-data="model()" >
-        <input type="text" x-model="searchTerm" placeholder="Filter here..." class="input border border-gray-400 appearance-none rounded w-full px-3 py-3 pt-2 pb-2 focus focus:border-blue-600 focus:outline-none active:outline-none active:border-blue-600" >
+      <div x-data="model()">
+        <input
+          type="text"
+          x-model="searchTerm"
+          placeholder="Filter here..."
+          class="input border border-gray-400 appearance-none rounded w-full px-3 py-3 pt-2 pb-2 focus focus:border-blue-600 focus:outline-none active:outline-none active:border-blue-600"
+        />
         <ul class="my-4 grid grid-cols-3 gap-4">
-          <template x-for="[choice, pack] in Object.entries(visibleOptions())" :key="choice">
+          <template
+            x-for="[choice, pack] in Object.entries(visibleOptions())"
+            :key="choice"
+          >
             <div class="flex flex-row">
-              <input class="self-center" type="checkbox" :id="choice" x-model="selected[choice]" @change="updateUrl()"></input>
-              <label class="self-center ml-2" :for="choice" x-text="pack.name"></label>
+              <input
+                class="self-center"
+                type="checkbox"
+                :id="choice"
+                x-model="selected[choice]"
+                @change="updateUrl()"
+              />
+              <label
+                class="self-center ml-2"
+                :for="choice"
+                x-text="pack.name"
+              ></label>
             </div>
           </template>
         </ul>
 
-        <code class="bg-gray-100 p-4 rounded border border-gray-300 overflow-x-auto text-xs font-mono flex flex-col">
+        <code
+          class="bg-gray-100 p-4 rounded border border-gray-300 overflow-x-auto text-xs font-mono flex flex-col"
+        >
           <template x-for="line in dockerfile()">
             <span class="whitespace-pre" x-text="line"></span>
           </template>
         </code>
 
-        <button @click="$clipboard(dockerfile().join('\n'))" class="my-4 px-8 py-2 rounded border border-blue-600 text-blue-600 max-w-max shadow-sm hover:shadow-md">Copy 📋</button>
+        <button
+          @click="$clipboard(dockerfile().join('\n'))"
+          class="my-4 px-8 py-2 rounded border border-blue-600 text-blue-600 max-w-max shadow-sm hover:shadow-md"
+        >
+          Copy 📋
+        </button>
       </div>
     </main>
     <footer class="mb-5">
-      <p class="font-bold text-gray-700 uppercase underline mt-4 mb-2 mx-auto">Links:</p>
+      <p class="font-bold text-gray-700 uppercase underline mt-4 mb-2 mx-auto">
+        Links:
+      </p>
       <div class="flex flex-row justify-between">
-        <a href="https://felipesere.com" class="text-blue-700 text-md hover:text-blue-500">Blog</a>
-        <a href="https://twitter.com/felipesere" class="text-blue-700  text-md hover:text-blue-500">Twitter</a>
-        <a href="https://github.com/felipesere/dockerfile.dev" class="text-blue-700 text-md hover:text-blue-500">GitHub</a>
+        <a
+          href="https://felipesere.com"
+          class="text-blue-700 text-md hover:text-blue-500"
+          >Blog</a
+        >
+        <a
+          href="https://twitter.com/felipesere"
+          class="text-blue-700 text-md hover:text-blue-500"
+          >Twitter</a
+        >
+        <a
+          href="https://github.com/felipesere/dockerfile.dev"
+          class="text-blue-700 text-md hover:text-blue-500"
+          >GitHub</a
+        >
       </div>
     </footer>
   </body>

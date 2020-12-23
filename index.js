@@ -6,35 +6,30 @@ const ubuntu1804 = {
   },
   args: {},
   layers: [],
-}
+};
 
 const builtinOptions = {
-  "jq": {
+  jq: {
     name: "jq",
     apt: ["jq"],
   },
 
   "aws/cli v1": {
     name: "AWS/Cli v1",
-    apt: [
-      "awscli",
-    ],
+    apt: ["awscli"],
   },
   "aws/cli v2": {
     name: "AWS/Cli v2",
-    apt: [
-      "curl",
-      "unzip",
-    ],
+    apt: ["curl", "unzip"],
     lines: [
       {
         run: [
           "curl 'https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip' -o 'awscliv2.zip'",
           "unzip awscliv2.zip",
-          "./aws/install"
-        ]
-      }
-    ]
+          "./aws/install",
+        ],
+      },
+    ],
   },
   "terraform 13": {
     name: "Terraform 13",
@@ -43,114 +38,135 @@ const builtinOptions = {
     },
     apt: [],
     lines: [
-      { add: "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_386.zip /src/${TERRAFORM_VERSION}.zip"},
-      { run: "unzip /src/${TERRAFORM_VERSION}.zip -d /usr/local/bin"},
-    ]
+      {
+        add:
+          "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_386.zip /src/${TERRAFORM_VERSION}.zip",
+      },
+      { run: "unzip /src/${TERRAFORM_VERSION}.zip -d /usr/local/bin" },
+    ],
   },
-  "docker": {
+  docker: {
     name: "Docker",
     apt: [
       "apt-transport-https",
       "ca-certificates",
       "curl",
       "gnupg-agent",
-      "software-properties-common"
+      "software-properties-common",
     ],
     lines: [
-      { run: "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -"},
-      { run: 'apt-add-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"' },
-      { run: 'apt-get update && apt-get -y install docker-ce docker-ce-cli containerd.io' }
-    ]
+      {
+        run:
+          "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -",
+      },
+      {
+        run:
+          'apt-add-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"',
+      },
+      {
+        run:
+          "apt-get update && apt-get -y install docker-ce docker-ce-cli containerd.io",
+      },
+    ],
   },
   "jdk 11": {
     name: "JDK 11",
     apt: ["openjdk-11-jdk"],
   },
-  "gradle": {
+  gradle: {
     name: "Gradle",
     env: {
       GRADLE_HOME: "/gradle-$GRADLE_VERSION",
-      PATH: "$GRADLE_HOME/bin:$PATH"
+      PATH: "$GRADLE_HOME/bin:$PATH",
     },
     args: {
-      GRADLE_VERSION: "6.6.1"
+      GRADLE_VERSION: "6.6.1",
     },
     apt: ["curl", "unzip"],
     lines: [
       {
-        run: ["curl https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -OJL",
+        run: [
+          "curl https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -OJL",
           "unzip gradle-${GRADLE_VERSION}-bin.zip",
-          "cp ./gradle-${GRADLE_VERSION}/bin/gradle /usr/local/bin"
+          "cp ./gradle-${GRADLE_VERSION}/bin/gradle /usr/local/bin",
         ],
-      }
-    ]
-  }
-}
+      },
+    ],
+  },
+};
 
 function dockerfile(choices) {
-  let extras = choices.map((c) => builtinOptions[c])
+  let extras = choices.map((c) => builtinOptions[c]);
 
-  return toDockerfile(ubuntu1804, extras)
+  return toDockerfile(ubuntu1804, extras);
 }
 
 function toDockerfile(config, packs) {
-  let dockerfile = []
+  let dockerfile = [];
   let allArgs = {
     ...config.args,
-  }
-  let allAptPackages = []
-  let envs = config.env
+  };
+  let allAptPackages = [];
+  let envs = config.env;
   for (const pack of packs) {
-    allArgs = {...allArgs, ...pack.args}
-    if (pack.apt.length) { // track packs thats need 'apt' packages installed
-      allAptPackages = allAptPackages.concat([pack])
+    allArgs = { ...allArgs, ...pack.args };
+    if (pack.apt.length) {
+      // track packs thats need 'apt' packages installed
+      allAptPackages = allAptPackages.concat([pack]);
     }
-    envs = {...envs, ...pack.env}
+    envs = { ...envs, ...pack.env };
   }
-  dockerfile.push(`FROM ${config.from}`)
+  dockerfile.push(`FROM ${config.from}`);
 
   for (const [k, v] of Object.entries(allArgs)) {
-    dockerfile.push(`ARG ${k}=${v}`)
+    dockerfile.push(`ARG ${k}=${v}`);
   }
   for (const [k, v] of Object.entries(envs)) {
-    dockerfile.push(`ENV ${k}=${v}`)
+    dockerfile.push(`ENV ${k}=${v}`);
   }
 
   if (allAptPackages.length) {
     // write a nice comment:
-    let uniqueAptPackages = [...new Set(allAptPackages.flatMap(pack => pack.apt))];
-    dockerfile.push(`// for ${allAptPackages.map(pack => pack.name).join(", ")}`)
-    dockerfile.push(`RUN apt-get update && apt-get -y install \\\n\t${uniqueAptPackages.join(` \\\n\t`)}`)
+    let uniqueAptPackages = [
+      ...new Set(allAptPackages.flatMap((pack) => pack.apt)),
+    ];
+    dockerfile.push(
+      `// for ${allAptPackages.map((pack) => pack.name).join(", ")}`
+    );
+    dockerfile.push(
+      `RUN apt-get update && apt-get -y install \\\n\t${uniqueAptPackages.join(
+        ` \\\n\t`
+      )}`
+    );
   }
 
   for (const pack of packs) {
     if (pack.lines && pack.lines.length) {
-      dockerfile.push(`\n`)
-      dockerfile.push(`// for ${pack.name}:`)
-      for (const line of (pack.lines || [])) {
+      dockerfile.push(`\n`);
+      dockerfile.push(`// for ${pack.name}:`);
+      for (const line of pack.lines || []) {
         if (line.add) {
-          dockerfile.push(`ADD ${line.add}`)
+          dockerfile.push(`ADD ${line.add}`);
         }
         if (line.run) {
           if (Array.isArray(line.run)) {
-            dockerfile.push(`RUN ${line.run.join(" && \\\n\t")}`)
+            dockerfile.push(`RUN ${line.run.join(" && \\\n\t")}`);
           } else {
-            dockerfile.push(`RUN ${line.run}`)
+            dockerfile.push(`RUN ${line.run}`);
           }
         }
       }
     }
   }
 
-  return dockerfile
+  return dockerfile;
 }
 
 // If we are running in the browser, there is no need to go through a module
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     dockerfile,
     toDockerfile,
     ubuntu1804,
   };
 }
-
