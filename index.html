@@ -2,6 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Dockerfile</title>
     <link rel="shortcut icon" href="/docker.ico" />
 
@@ -68,10 +70,10 @@
   </head>
 
   <body
-    class="max-w-prose mx-auto bg-grey-light leading-normal tracking-normal flex flex-col h-screen justify-between"
+    class="[ max-w-prose h-screen mx-auto ] px-2 md:px-0 [ flex flex-col justify-between ]"
   >
     <main class="mb-auto">
-      <h1 class="text-4xl font-normal tracking-wide my-12">
+      <h1 class="text-4xl tracking-wide my-4 md:my-12">
         Generate a quick Dockerfile
       </h1>
 
@@ -82,7 +84,7 @@
           placeholder="Filter here..."
           class="input border border-gray-400 appearance-none rounded w-full px-3 py-3 pt-2 pb-2 focus focus:border-blue-600 focus:outline-none active:outline-none active:border-blue-600"
         />
-        <ul class="my-4 grid grid-cols-3 gap-4">
+        <ul class="my-4 grid grid-cols-2 md:grid-cols-3 gap-4">
           <template
             x-for="[choice, pack] in Object.entries(visibleOptions())"
             :key="choice"
