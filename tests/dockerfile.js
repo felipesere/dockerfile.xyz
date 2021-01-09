@@ -21,7 +21,7 @@ test("adding multiple packages", () => {
       "FROM ubuntu:18.04",
       "ENV DEBIAN_FRONTEND=noninteractive",
       "ENV TZ=Europe/London",
-      "// for jq, AWS/Cli v1",
+      "# for jq, AWS/Cli v1",
       "RUN apt-get update && apt-get -y install \\\n\tjq \\\n\tawscli",
     ]
   );
@@ -37,7 +37,7 @@ test("removes duplicate apt packages", () => {
       "FROM ubuntu:18.04",
       "ENV DEBIAN_FRONTEND=noninteractive",
       "ENV TZ=Europe/London",
-      "// for jq, AWS/Cli v1",
+      "# for jq, AWS/Cli v1",
       "RUN apt-get update && apt-get -y install \\\n\tjq \\\n\tcurl \\\n\tawscli",
     ]
   );
@@ -58,10 +58,10 @@ test('"run" lines also get a comment as to why they are added', () => {
       "ENV DEBIAN_FRONTEND=noninteractive",
       "ENV TZ=Europe/London",
       "\n",
-      "// for Single Line:",
+      "# for Single Line:",
       "RUN just one line",
       "\n",
-      "// for Multipels Lines:",
+      "# for Multipels Lines:",
       "RUN one line && \\\n\tand another",
     ]
   );

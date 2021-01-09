@@ -131,7 +131,7 @@ function toDockerfile(config, packs) {
       ...new Set(allAptPackages.flatMap((pack) => pack.apt)),
     ];
     dockerfile.push(
-      `// for ${allAptPackages.map((pack) => pack.name).join(", ")}`
+      `# for ${allAptPackages.map((pack) => pack.name).join(", ")}`
     );
     dockerfile.push(
       `RUN apt-get update && apt-get -y install \\\n\t${uniqueAptPackages.join(
@@ -143,7 +143,7 @@ function toDockerfile(config, packs) {
   for (const pack of packs) {
     if (pack.lines && pack.lines.length) {
       dockerfile.push(`\n`);
-      dockerfile.push(`// for ${pack.name}:`);
+      dockerfile.push(`# for ${pack.name}:`);
       for (const line of pack.lines || []) {
         if (line.add) {
           dockerfile.push(`ADD ${line.add}`);
